@@ -14,7 +14,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 import MySQLdb
 
-db_path = "mysql://shuichi:V3Bty@45.32.249.213:3306/twitter"
+db_path = "mysql:///twitter"
 url_sql = urlparse(db_path)
 conn = create_engine('mysql+pymysql://{user}:{password}@{host}:{port}/{database}'.format(host = url_sql.hostname, port=url_sql.port, user = url_sql.username, password= url_sql.password, database = url_sql.path[1:]))
 
@@ -45,7 +45,7 @@ fix_hairline=True,
 
 
 
-db_path = "mysql://shuichi:V3Bty@45.32.249.213:3306/Amazon"
+db_path = "mysql:///Amazon"
 url_sql = urlparse(db_path)
 conn = create_engine('mysql+pymysql://{user}:{password}@{host}:{port}/{database}'.format(host = url_sql.hostname, port=url_sql.port, user = url_sql.username, password= url_sql.password, database = url_sql.path[1:]))
 
