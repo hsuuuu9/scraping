@@ -13,6 +13,7 @@ from urllib.parse import urlparse
 from sqlalchemy import create_engine
 import pandas as pd
 import MySQLdb
+import datetime
 
 db_path = "mysql://shuichi:V3Bty@45.32.249.213:3306/twitter"
 url_sql = urlparse(db_path)
@@ -105,11 +106,17 @@ for i in range(len(df)):
                 except:
                     pass
             if price == point and price != 0:
-                pass
+                try:
+                    WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID,"productTitle")))
+                    title = driver.find_element_by_id('productTitle').text
+                except:
+                    title = 'タイトル'
+                letter='update Amazon.freebooks set title = "'+title+'" where asin = "'+product+'"'
+                conn.execute(letter)
             else:
                 letter='delete from Amazon.freebooks where asin = "'+product+'"'
                 conn.execute(letter)
-                f.write('delete:'+product+':not price')
+                f.write('delete:'+product+':not price'+'\n')
             all_count += 1
             p = 0
             while True:
@@ -155,7 +162,7 @@ for i in range(len(df)):
                             if len(df_new)==0:
                                 letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE)'
                                 conn.execute(letter)
-                                f.write('append:'+new_asin)
+                                f.write('append:'+new_asin+'\n')
 
             p = 0
             while True:
@@ -200,13 +207,13 @@ for i in range(len(df)):
                             if len(df_new)==0:
                                 letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE)'
                                 conn.execute(letter)
-                                f.write('append:'+new_asin)
+                                f.write('append:'+new_asin+'\n')
             letter = 'update Amazon.freebooks set check_flag = TRUE where asin = "'+product+'"'
             conn.execute(letter)
         else:
             letter='delete from Amazon.freebooks where asin = "'+product+'"'
             conn.execute(letter)
-            f.write('delete:'+product+':series')
+            f.write('delete:'+product+':series'+'\n')
     if all_count > 4:
         break
 
@@ -259,11 +266,17 @@ if len(df) == check_flag_sum:
                     except:
                         pass
                 if price == point and price != 0:
-                    pass
+                    try:
+                        WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID,"productTitle")))
+                        title = driver.find_element_by_id('productTitle').text
+                    except:
+                        title = 'タイトル'
+                    letter='update Amazon.freebooks set title = "'+title+'" where asin = "'+product+'"'
+                    conn.execute(letter)
                 else:
                     letter='delete from Amazon.freebooks where asin = "'+product+'"'
                     conn.execute(letter)
-                    f.write('delete:'+product+':not price')
+                    f.write('delete:'+product+':not price'+'\n')
                 all_count += 1
                 p = 0
                 while True:
@@ -309,7 +322,7 @@ if len(df) == check_flag_sum:
                                 if len(df_new)==0:
                                     letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE)'
                                     conn.execute(letter)
-                                    f.write('append:'+new_asin)
+                                    f.write('append:'+new_asin+'\n')
 
                 p = 0
                 while True:
@@ -354,14 +367,21 @@ if len(df) == check_flag_sum:
                                 if len(df_new)==0:
                                     letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE)'
                                     conn.execute(letter)
-                                    f.write('append:'+new_asin)
+                                    f.write('append:'+new_asin+'\n')
                 letter = 'update Amazon.freebooks set check_flag = TRUE where asin = "'+product+'"'
                 conn.execute(letter)
             else:
                 letter='delete from Amazon.freebooks where asin = "'+product+'"'
                 conn.execute(letter)
-                f.write('delete:'+product+':series')
+                f.write('delete:'+product+':series'+'\n')
         if all_count > 4:
             break
 f.close()
 driver.quit()
+
+import json
+
+t = datetime.datetime.now()
+fname = "bb.json"
+with open(fname, "w", encoding="utf-8") as f:
+        f.write(str(t.strftime('%Y-%m-%d %H:%M:%S')))
