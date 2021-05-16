@@ -160,7 +160,7 @@ for i in range(len(df)):
                             letter_new = 'select * from Amazon.freebooks where asin = "'+new_asin+'"'
                             df_new = pd.read_sql(letter_new, conn)
                             if len(df_new)==0:
-                                letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE)'
+                                letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE,FALSE,"タイトル")'
                                 conn.execute(letter)
                                 f.write('append:'+new_asin+'\n')
 
@@ -205,7 +205,7 @@ for i in range(len(df)):
                             letter_new = 'select * from Amazon.freebooks where asin = "'+new_asin+'"'
                             df_new = pd.read_sql(letter_new, conn)
                             if len(df_new)==0:
-                                letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE)'
+                                letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE,FALSE,"タイトル")'
                                 conn.execute(letter)
                                 f.write('append:'+new_asin+'\n')
             letter = 'update Amazon.freebooks set check_flag = TRUE where asin = "'+product+'"'
@@ -320,7 +320,7 @@ if len(df) == check_flag_sum:
                                 letter_new = 'select * from Amazon.freebooks where asin = "'+new_asin+'"'
                                 df_new = pd.read_sql(letter_new, conn)
                                 if len(df_new)==0:
-                                    letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE)'
+                                    letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE,FALSE,"タイトル")'
                                     conn.execute(letter)
                                     f.write('append:'+new_asin+'\n')
 
@@ -365,7 +365,7 @@ if len(df) == check_flag_sum:
                                 letter_new = 'select * from Amazon.freebooks where asin = "'+new_asin+'"'
                                 df_new = pd.read_sql(letter_new, conn)
                                 if len(df_new)==0:
-                                    letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE)'
+                                    letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE,FALSE,"タイトル")'
                                     conn.execute(letter)
                                     f.write('append:'+new_asin+'\n')
                 letter = 'update Amazon.freebooks set check_flag = TRUE where asin = "'+product+'"'
