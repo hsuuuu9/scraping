@@ -14,13 +14,13 @@ from sqlalchemy import create_engine
 import pandas as pd
 import MySQLdb
 
-db_path = "mysql:///twitter"
+db_path = "mysql://shuichi:V3Bty@45.32.249.213:3306/twitter"
 url_sql = urlparse(db_path)
 conn = create_engine('mysql+pymysql://{user}:{password}@{host}:{port}/{database}'.format(host = url_sql.hostname, port=url_sql.port, user = url_sql.username, password= url_sql.password, database = url_sql.path[1:]))
 
 letter_ua = 'select * from twitter.useragent'
 df_ua = pd.read_sql(letter_ua, conn)
-user_agent = df_ua['ua'][random.randint(0, len(df))]
+user_agent = df_ua['ua'][random.randint(0, len(df_ua))]
 
 
 
@@ -30,8 +30,8 @@ options.add_experimental_option('useAutomationExtension', False)
 options.add_argument('--disable-desktop-notifications')
 options.add_argument("--disable-extensions")
 options.add_argument('--user-agent=' + user_agent)
-#options.add_argument('--no-sandbox')
-#options.add_argument('--headless')
+options.add_argument('--no-sandbox')
+options.add_argument('--headless')
 options.add_argument('--lang=ja')
 options.add_argument('--blink-settings=imagesEnabled=false')
 driver = webdriver.Chrome(options=options)
@@ -45,7 +45,7 @@ fix_hairline=True,
 
 
 
-db_path = "mysql:///Amazon"
+db_path = "mysql://shuichi:V3Bty@45.32.249.213:3306/Amazon"
 url_sql = urlparse(db_path)
 conn = create_engine('mysql+pymysql://{user}:{password}@{host}:{port}/{database}'.format(host = url_sql.hostname, port=url_sql.port, user = url_sql.username, password= url_sql.password, database = url_sql.path[1:]))
 
@@ -54,6 +54,8 @@ df = pd.read_sql(letter, conn)
 
 all_count = 0
 check_flag_sum = 0
+
+f = open('asin_log.txt', 'a')
 
 for i in range(len(df)):
     product = df['asin'][i]
@@ -107,6 +109,7 @@ for i in range(len(df)):
             else:
                 letter='delete from Amazon.freebooks where asin = "'+product+'"'
                 conn.execute(letter)
+                f.write('delete:'+product+':not price')
             all_count += 1
             p = 0
             while True:
@@ -147,11 +150,12 @@ for i in range(len(df)):
                             url = atag.get_attribute('href')
                             place = url.find('pd_rd_i=')
                             new_asin = url[place+8:place+18]
-                            letter = 'select * from Amazon.freebooks where asin = "'+new_asin+'"'
-                            df_new = pd.read_sql(letter, conn)
+                            letter_new = 'select * from Amazon.freebooks where asin = "'+new_asin+'"'
+                            df_new = pd.read_sql(letter_new, conn)
                             if len(df_new)==0:
                                 letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE)'
                                 conn.execute(letter)
+                                f.write('append:'+new_asin)
 
             p = 0
             while True:
@@ -191,21 +195,23 @@ for i in range(len(df)):
                             url = atag.get_attribute('href')
                             place = url.find('pd_rd_i=')
                             new_asin = url[place+8:place+18]
-                            letter = 'select * from Amazon.freebooks where asin = "'+new_asin+'"'
-                            df_new = pd.read_sql(letter, conn)
+                            letter_new = 'select * from Amazon.freebooks where asin = "'+new_asin+'"'
+                            df_new = pd.read_sql(letter_new, conn)
                             if len(df_new)==0:
                                 letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE)'
                                 conn.execute(letter)
+                                f.write('append:'+new_asin)
             letter = 'update Amazon.freebooks set check_flag = TRUE where asin = "'+product+'"'
             conn.execute(letter)
         else:
             letter='delete from Amazon.freebooks where asin = "'+product+'"'
             conn.execute(letter)
+            f.write('delete:'+product+':series')
     if all_count > 4:
         break
 
 if len(df) == check_flag_sum:
-    new_list = random.sample([n for n in range(len(df))], 10)
+    new_list = random.sample([n for n in range(len(df))], 7)
     for i in new_list:
         product = df['asin'][i]
         check_flag = 0
@@ -257,6 +263,7 @@ if len(df) == check_flag_sum:
                 else:
                     letter='delete from Amazon.freebooks where asin = "'+product+'"'
                     conn.execute(letter)
+                    f.write('delete:'+product+':not price')
                 all_count += 1
                 p = 0
                 while True:
@@ -297,11 +304,12 @@ if len(df) == check_flag_sum:
                                 url = atag.get_attribute('href')
                                 place = url.find('pd_rd_i=')
                                 new_asin = url[place+8:place+18]
-                                letter = 'select * from Amazon.freebooks where asin = "'+new_asin+'"'
-                                df_new = pd.read_sql(letter, conn)
+                                letter_new = 'select * from Amazon.freebooks where asin = "'+new_asin+'"'
+                                df_new = pd.read_sql(letter_new, conn)
                                 if len(df_new)==0:
                                     letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE)'
                                     conn.execute(letter)
+                                    f.write('append:'+new_asin)
 
                 p = 0
                 while True:
@@ -341,19 +349,19 @@ if len(df) == check_flag_sum:
                                 url = atag.get_attribute('href')
                                 place = url.find('pd_rd_i=')
                                 new_asin = url[place+8:place+18]
-                                letter = 'select * from Amazon.freebooks where asin = "'+new_asin+'"'
-                                df_new = pd.read_sql(letter, conn)
+                                letter_new = 'select * from Amazon.freebooks where asin = "'+new_asin+'"'
+                                df_new = pd.read_sql(letter_new, conn)
                                 if len(df_new)==0:
                                     letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE)'
                                     conn.execute(letter)
+                                    f.write('append:'+new_asin)
                 letter = 'update Amazon.freebooks set check_flag = TRUE where asin = "'+product+'"'
                 conn.execute(letter)
             else:
                 letter='delete from Amazon.freebooks where asin = "'+product+'"'
                 conn.execute(letter)
+                f.write('delete:'+product+':series')
         if all_count > 4:
             break
-
-
-
+f.close()
 driver.quit()
