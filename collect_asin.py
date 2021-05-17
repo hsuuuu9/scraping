@@ -106,6 +106,7 @@ for i in range(len(df)):
                 except:
                     pass
             if price == point and price != 0:
+                driver.execute_script("window.scrollTo(0, 200);")
                 try:
                     WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID,"productTitle")))
                     title = driver.find_element_by_id('productTitle').text
@@ -116,7 +117,7 @@ for i in range(len(df)):
             else:
                 letter='delete from Amazon.freebooks where asin = "'+product+'"'
                 conn.execute(letter)
-                f.write('delete:'+product+':not price'+'\n')
+                f.write('delete:'+product+':not price')
             all_count += 1
             p = 0
             while True:
@@ -162,7 +163,7 @@ for i in range(len(df)):
                             if len(df_new)==0:
                                 letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE,FALSE,"タイトル")'
                                 conn.execute(letter)
-                                f.write('append:'+new_asin+'\n')
+                                f.write('append:'+new_asin)
 
             p = 0
             while True:
@@ -207,13 +208,13 @@ for i in range(len(df)):
                             if len(df_new)==0:
                                 letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE,FALSE,"タイトル")'
                                 conn.execute(letter)
-                                f.write('append:'+new_asin+'\n')
+                                f.write('append:'+new_asin)
             letter = 'update Amazon.freebooks set check_flag = TRUE where asin = "'+product+'"'
             conn.execute(letter)
         else:
             letter='delete from Amazon.freebooks where asin = "'+product+'"'
             conn.execute(letter)
-            f.write('delete:'+product+':series'+'\n')
+            f.write('delete:'+product+':series')
     if all_count > 4:
         break
 
@@ -266,6 +267,7 @@ if len(df) == check_flag_sum:
                     except:
                         pass
                 if price == point and price != 0:
+                    driver.execute_script("window.scrollTo(0, 200);")
                     try:
                         WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID,"productTitle")))
                         title = driver.find_element_by_id('productTitle').text
@@ -276,7 +278,7 @@ if len(df) == check_flag_sum:
                 else:
                     letter='delete from Amazon.freebooks where asin = "'+product+'"'
                     conn.execute(letter)
-                    f.write('delete:'+product+':not price'+'\n')
+                    f.write('delete:'+product+':not price')
                 all_count += 1
                 p = 0
                 while True:
@@ -322,7 +324,7 @@ if len(df) == check_flag_sum:
                                 if len(df_new)==0:
                                     letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE,FALSE,"タイトル")'
                                     conn.execute(letter)
-                                    f.write('append:'+new_asin+'\n')
+                                    f.write('append:'+new_asin)
 
                 p = 0
                 while True:
@@ -367,13 +369,13 @@ if len(df) == check_flag_sum:
                                 if len(df_new)==0:
                                     letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE,FALSE,"タイトル")'
                                     conn.execute(letter)
-                                    f.write('append:'+new_asin+'\n')
+                                    f.write('append:'+new_asin)
                 letter = 'update Amazon.freebooks set check_flag = TRUE where asin = "'+product+'"'
                 conn.execute(letter)
             else:
                 letter='delete from Amazon.freebooks where asin = "'+product+'"'
                 conn.execute(letter)
-                f.write('delete:'+product+':series'+'\n')
+                f.write('delete:'+product+':series')
         if all_count > 4:
             break
 f.close()
