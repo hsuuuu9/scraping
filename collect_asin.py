@@ -31,8 +31,8 @@ options.add_experimental_option('useAutomationExtension', False)
 options.add_argument('--disable-desktop-notifications')
 options.add_argument("--disable-extensions")
 options.add_argument('--user-agent=' + user_agent)
-options.add_argument('--no-sandbox')
-options.add_argument('--headless')
+'''options.add_argument('--no-sandbox')
+options.add_argument('--headless')'''
 options.add_argument('--lang=ja')
 options.add_argument('--blink-settings=imagesEnabled=false')
 driver = webdriver.Chrome(options=options)
@@ -73,39 +73,20 @@ for i in range(len(df)):
             pass
         if series_flag:
             price = 10000000
-            point = 20000000
-            count = 0
+            FREE_flag = False
             try:
-                WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME,"tmm-olp-links")))
-                add = driver.find_elements_by_class_name('tmm-olp-links')
+                #WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR,".a-lineitem.a-spacing-small.pointsAwarePriceBlock")))
+                WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID,'CombinedBuybox')))
             except:
-                add = []
-            for letters in add:
-                if '獲得ポイント' in letters.text:
-                    count += 1
-                    WebDriverWait(letters, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR,".extra-message.olp-link")))
-                    price_element = letters.find_element_by_css_selector(".extra-message.olp-link")
-                    if "Kindle 価格" in price_element.text:
-                        price = int(re.sub(r"\D", "", price_element.text))
-                    WebDriverWait(letters, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR,".a-size-mini.a-color-secondary.extra-message")))
-                    point_element = letters.find_element_by_css_selector(".a-size-mini.a-color-secondary.extra-message")
-                    if "獲得ポイント" in point_element.text:
-                        point = int(re.sub(r"\D", "", point_element.text))
-            if count == 0 and len(add)!=0:
-                WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR,".a-button.a-button-selected.a-spacing-mini.a-button-toggle.format")))
-                add_element = driver.find_element_by_css_selector(".a-button.a-button-selected.a-spacing-mini.a-button-toggle.format")
-                try:
-                    WebDriverWait(add_element, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR,".a-size-base.a-color-price.a-color-price")))
-                    if "￥" in add_element.find_element_by_css_selector(".a-size-base.a-color-price.a-color-price").text:
-                        price_element = add_element.find_element_by_css_selector(".a-size-base.a-color-price.a-color-price")
-                        price = int(re.sub(r"\D", "", price_element.text))
-                    WebDriverWait(add_element, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR,".a-color-price.a-text-normal")))
-                    if "獲得ポイント" in add_element.find_element_by_css_selector(".a-color-price.a-text-normal").text:
-                        point_element = add_element.find_element_by_css_selector(".a-color-price.a-text-normal")
-                        point = int(re.sub(r"\D", "", point_element.text))
-                except:
-                    pass
-            if price == point and price != 0:
+                pass
+            #right = driver.find_element_by_css_selector('.a-lineitem.a-spacing-small.pointsAwarePriceBlock')
+            right = driver.find_element_by_id('CombinedBuybox')
+            if not '獲得ポイント' in right.text:
+                first_place = right.text.find('Kindle 価格:')
+                last_place = right.text.find('(税込)')
+                price = int(re.sub(r"\D", "", right.text[first_place:last_place]))
+                FREE_flag = True
+            if FREE_flag and price != 0:
                 driver.execute_script("window.scrollTo(0, 200);")
                 try:
                     WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID,"productTitle")))
@@ -234,39 +215,20 @@ if len(df) == check_flag_sum:
                 pass
             if series_flag:
                 price = 10000000
-                point = 20000000
-                count = 0
+                FREE_flag = False
                 try:
-                    WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME,"tmm-olp-links")))
-                    add = driver.find_elements_by_class_name('tmm-olp-links')
+                    #WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR,".a-lineitem.a-spacing-small.pointsAwarePriceBlock")))
+                    WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID,'CombinedBuybox')))
                 except:
-                    add = []
-                for letters in add:
-                    if '獲得ポイント' in letters.text:
-                        count += 1
-                        WebDriverWait(letters, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR,".extra-message.olp-link")))
-                        price_element = letters.find_element_by_css_selector(".extra-message.olp-link")
-                        if "Kindle 価格" in price_element.text:
-                            price = int(re.sub(r"\D", "", price_element.text))
-                        WebDriverWait(letters, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR,".a-size-mini.a-color-secondary.extra-message")))
-                        point_element = letters.find_element_by_css_selector(".a-size-mini.a-color-secondary.extra-message")
-                        if "獲得ポイント" in point_element.text:
-                            point = int(re.sub(r"\D", "", point_element.text))
-                if count == 0 and len(add)!=0:
-                    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR,".a-button.a-button-selected.a-spacing-mini.a-button-toggle.format")))
-                    add_element = driver.find_element_by_css_selector(".a-button.a-button-selected.a-spacing-mini.a-button-toggle.format")
-                    try:
-                        WebDriverWait(add_element, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR,".a-size-base.a-color-price.a-color-price")))
-                        if "￥" in add_element.find_element_by_css_selector(".a-size-base.a-color-price.a-color-price").text:
-                            price_element = add_element.find_element_by_css_selector(".a-size-base.a-color-price.a-color-price")
-                            price = int(re.sub(r"\D", "", price_element.text))
-                        WebDriverWait(add_element, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR,".a-color-price.a-text-normal")))
-                        if "獲得ポイント" in add_element.find_element_by_css_selector(".a-color-price.a-text-normal").text:
-                            point_element = add_element.find_element_by_css_selector(".a-color-price.a-text-normal")
-                            point = int(re.sub(r"\D", "", point_element.text))
-                    except:
-                        pass
-                if price == point and price != 0:
+                    pass
+                #right = driver.find_element_by_css_selector('.a-lineitem.a-spacing-small.pointsAwarePriceBlock')
+                right = driver.find_element_by_id('CombinedBuybox')
+                if not '獲得ポイント' in right.text:
+                    first_place = right.text.find('Kindle 価格:')
+                    last_place = right.text.find('(税込)')
+                    price = int(re.sub(r"\D", "", right.text[first_place:last_place]))
+                    FREE_flag = True
+                if FREE_flag and price != 0:
                     driver.execute_script("window.scrollTo(0, 200);")
                     try:
                         WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID,"productTitle")))
@@ -386,4 +348,4 @@ import json
 t = datetime.datetime.now()
 fname = "bb.json"
 with open(fname, "w", encoding="utf-8") as f:
-        f.write(str(t.strftime('%Y-%m-%d %H:%M:%S')))
+    f.write(str(t.strftime('%Y-%m-%d %H:%M:%S')))
