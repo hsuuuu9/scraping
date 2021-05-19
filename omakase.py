@@ -35,14 +35,14 @@ url_sql = urlparse(db_path)
 conn = create_engine('mysql+pymysql://{user}:{password}@{host}:{port}/{database}'.format(host = url_sql.hostname, port=url_sql.port, user = url_sql.username, password= url_sql.password, database = url_sql.path[1:]))
 le = 'select * from omakase.name;'
 df = pd.read_sql(le,conn)
-for i in range(122):
-    store_code = df['id'][i]
-    ok = int(df['OK'][i])
-    ng = int(df['NG'][i])
-    letter_ua = 'select * from twitter.useragent'
-    df_ua = pd.read_sql(letter_ua, conn)
-    user_agent = df_ua['ua'][random.randint(0, len(df))]
-    headers = {"User-Agent": user_agent}
+number_list = [n for n in range(122)]
+random.shuffle(number_list)
+for i in range(50):
+    n = number_list[i]
+    time.sleep(4)
+    store_code = df['id'][n]
+    ok = int(df['OK'][n])
+    ng = int(df['NG'][n])
     url = 'https://omakase.in/ja/r/' + store_code
     driver.get(url)
     flag = False
