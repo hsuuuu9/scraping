@@ -15,7 +15,7 @@ import pandas as pd
 import MySQLdb
 import datetime
 
-db_path = "mysql://twitter"
+db_path = "mysql://shuichi:V3Bty@45.32.249.213:3306/twitter"
 url_sql = urlparse(db_path)
 conn = create_engine('mysql+pymysql://{user}:{password}@{host}:{port}/{database}'.format(host = url_sql.hostname, port=url_sql.port, user = url_sql.username, password= url_sql.password, database = url_sql.path[1:]))
 
@@ -46,7 +46,7 @@ fix_hairline=True,
 
 
 
-db_path = "mysql://Amazon"
+db_path = "mysql://shuichi:V3Bty@45.32.249.213:3306/Amazon"
 url_sql = urlparse(db_path)
 conn = create_engine('mysql+pymysql://{user}:{password}@{host}:{port}/{database}'.format(host = url_sql.hostname, port=url_sql.port, user = url_sql.username, password= url_sql.password, database = url_sql.path[1:]))
 
@@ -57,7 +57,16 @@ all_count = 0
 check_flag_sum = 0
 
 f = open('asin_log.txt', 'a')
-
+driver.get('https://t.co/RP19yTB5m2?amp=1')
+try:
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME,"center")))
+    center = driver.find_element_by_tag_name('center')
+    atags = center.find_elements_by_tag_name('a')
+except:
+    pass
+if 'はい' in atags[0].text:
+    atags[0].click()
+time.sleep(3)
 for i in range(len(df)):
     product = df['asin'][i]
     check_flag = df['check_flag'][i]
@@ -74,11 +83,15 @@ for i in range(len(df)):
         if series_flag:
             price = 10000000
             FREE_flag = False
-            try:
-                #WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR,".a-lineitem.a-spacing-small.pointsAwarePriceBlock")))
-                WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID,'CombinedBuybox')))
-            except:
-                pass
+            while True:
+                try:
+                    #WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR,".a-lineitem.a-spacing-small.pointsAwarePriceBlock")))
+                    WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID,'CombinedBuybox')))
+                    if 'Kindle' in driver.find_element_by_id('CombinedBuybox').text:
+                        break
+                except:
+                    driver.refresh()
+                    time.sleep(5)
             #right = driver.find_element_by_css_selector('.a-lineitem.a-spacing-small.pointsAwarePriceBlock')
             right = driver.find_element_by_id('CombinedBuybox')
             if not '獲得ポイント' in right.text:
@@ -196,11 +209,11 @@ for i in range(len(df)):
             letter='delete from Amazon.freebooks where asin = "'+product+'"'
             conn.execute(letter)
             f.write('delete:'+product+':series')
-    if all_count > 4:
+    if all_count > 2:
         break
 
 if len(df) == check_flag_sum:
-    new_list = random.sample([n for n in range(len(df))], 7)
+    new_list = random.sample([n for n in range(len(df))], min(7,len(df)))
     for i in new_list:
         product = df['asin'][i]
         check_flag = 0
@@ -216,11 +229,15 @@ if len(df) == check_flag_sum:
             if series_flag:
                 price = 10000000
                 FREE_flag = False
-                try:
-                    #WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR,".a-lineitem.a-spacing-small.pointsAwarePriceBlock")))
-                    WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID,'CombinedBuybox')))
-                except:
-                    pass
+                while True:
+                    try:
+                        #WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR,".a-lineitem.a-spacing-small.pointsAwarePriceBlock")))
+                        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID,'CombinedBuybox')))
+                        if 'Kindle' in driver.find_element_by_id('CombinedBuybox').text:
+                            break
+                    except:
+                        driver.refresh()
+                        time.sleep(5)
                 #right = driver.find_element_by_css_selector('.a-lineitem.a-spacing-small.pointsAwarePriceBlock')
                 right = driver.find_element_by_id('CombinedBuybox')
                 if not '獲得ポイント' in right.text:
@@ -338,14 +355,7 @@ if len(df) == check_flag_sum:
                 letter='delete from Amazon.freebooks where asin = "'+product+'"'
                 conn.execute(letter)
                 f.write('delete:'+product+':series')
-        if all_count > 4:
+        if all_count > 2:
             break
 f.close()
 driver.quit()
-
-import json
-
-t = datetime.datetime.now()
-fname = "bb.json"
-with open(fname, "w", encoding="utf-8") as f:
-    f.write(str(t.strftime('%Y-%m-%d %H:%M:%S')))
