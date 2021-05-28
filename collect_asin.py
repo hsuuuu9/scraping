@@ -15,7 +15,7 @@ import pandas as pd
 import MySQLdb
 import datetime
 
-db_path = "mysql://twitter"
+db_path = "mysql://shuichi:V3Bty@45.32.249.213:3306/twitter"
 url_sql = urlparse(db_path)
 conn = create_engine('mysql+pymysql://{user}:{password}@{host}:{port}/{database}'.format(host = url_sql.hostname, port=url_sql.port, user = url_sql.username, password= url_sql.password, database = url_sql.path[1:]))
 
@@ -106,7 +106,7 @@ for i in range(len(df)):
                     title = driver.find_element_by_id('productTitle').text
                 except:
                     title = 'タイトル'
-                letter='update Amazon.freebooks set title = "'+title+'" where asin = "'+product+'"'
+                letter='update Amazon.freebooks set title = "'+title+'" price = '+str(price)+' where asin = "'+product+'"'
                 conn.execute(letter)
             else:
                 letter='delete from Amazon.freebooks where asin = "'+product+'"'
@@ -155,7 +155,7 @@ for i in range(len(df)):
                             letter_new = 'select * from Amazon.freebooks where asin = "'+new_asin+'"'
                             df_new = pd.read_sql(letter_new, conn)
                             if len(df_new)==0:
-                                letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE,FALSE,"タイトル")'
+                                letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE,FALSE,"タイトル",'+str(price)+')'
                                 conn.execute(letter)
                                 f.write('append:'+new_asin)
 
@@ -200,7 +200,7 @@ for i in range(len(df)):
                             letter_new = 'select * from Amazon.freebooks where asin = "'+new_asin+'"'
                             df_new = pd.read_sql(letter_new, conn)
                             if len(df_new)==0:
-                                letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE,FALSE,"タイトル")'
+                                letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE,FALSE,"タイトル",'+str(price)+')'
                                 conn.execute(letter)
                                 f.write('append:'+new_asin)
             letter = 'update Amazon.freebooks set check_flag = TRUE where asin = "'+product+'"'
@@ -209,7 +209,7 @@ for i in range(len(df)):
             letter='delete from Amazon.freebooks where asin = "'+product+'"'
             conn.execute(letter)
             f.write('delete:'+product+':series')
-    if all_count > 2:
+    if all_count > 1:
         break
 
 if len(df) == check_flag_sum:
@@ -252,7 +252,7 @@ if len(df) == check_flag_sum:
                         title = driver.find_element_by_id('productTitle').text
                     except:
                         title = 'タイトル'
-                    letter='update Amazon.freebooks set title = "'+title+'" where asin = "'+product+'"'
+                    letter='update Amazon.freebooks set title = "'+title+'" price = '+str(price)+' where asin = "'+product+'"'
                     conn.execute(letter)
                 else:
                     letter='delete from Amazon.freebooks where asin = "'+product+'"'
@@ -301,7 +301,7 @@ if len(df) == check_flag_sum:
                                 letter_new = 'select * from Amazon.freebooks where asin = "'+new_asin+'"'
                                 df_new = pd.read_sql(letter_new, conn)
                                 if len(df_new)==0:
-                                    letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE,FALSE,"タイトル")'
+                                    letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE,FALSE,"タイトル",'+str(price)+')'
                                     conn.execute(letter)
                                     f.write('append:'+new_asin)
 
@@ -346,7 +346,7 @@ if len(df) == check_flag_sum:
                                 letter_new = 'select * from Amazon.freebooks where asin = "'+new_asin+'"'
                                 df_new = pd.read_sql(letter_new, conn)
                                 if len(df_new)==0:
-                                    letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE,FALSE,"タイトル")'
+                                    letter = 'insert into Amazon.freebooks values("'+new_asin+'",FALSE,FALSE,"タイトル",'+str(price)+')'
                                     conn.execute(letter)
                                     f.write('append:'+new_asin)
                 letter = 'update Amazon.freebooks set check_flag = TRUE where asin = "'+product+'"'
@@ -355,7 +355,8 @@ if len(df) == check_flag_sum:
                 letter='delete from Amazon.freebooks where asin = "'+product+'"'
                 conn.execute(letter)
                 f.write('delete:'+product+':series')
-        if all_count > 2:
+        if all_count > 1:
             break
 f.close()
 driver.quit()
+
